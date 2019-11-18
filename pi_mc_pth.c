@@ -30,6 +30,20 @@ pthread_mutex_t
 
 void* thread_work(void* rank) {
   /*Your solution*/
+  double x, y, distance_squared;
+  long me = ((long) rank);
+  int me_int = (int) me;
+
+  for (int i = me; i < number_of_tosses; i += thread_count) {
+      x = 2 * rand_r(&me_int) / ((double)RAND_MAX) - 1.0;
+      y = 2 * rand_r(&me_int) / ((double)RAND_MAX) - 1.0;
+      distance_squared = x * x + y * y;
+      if (distance_squared <= 1) {
+          pthread_mutex_lock(&mutex);
+          number_in_circle++;
+          pthread_mutex_unlock(&mutex);
+      }
+  }
 
   return NULL;
 }
@@ -47,6 +61,21 @@ void* thread_work(void* rank) {
  */
 double parallel_pi(long long int no_tosses, int no_threads) {
   /*Your solution*/
+  thread_count = no_threads;
+  number_of_tosses = no_tosses;
+  pthread_t* threads = malloc(no_threads * sizeof(pthread_t));
+  pthread_mutex_init(&mutex, NULL);
 
-  return 0;
+  for (long i = 0; i < no_threads; i++) {
+      pthread_create(&threads[i], NULL, thread_work, (void*) i);
+  }
+
+  for (long i = 0; i < no_threads; i++) {
+      pthread_join(threads[i], NULL);
+  }
+
+  pthread_mutex_destroy(&mutex);
+  free(threads);
+
+  return 4.0 * number_in_circle / ((double) no_tosses);
 }
