@@ -35,7 +35,7 @@ char* pi_test(char* testmsg, long long int no_tosses, double threshold) {
 
   startwtime = get_time();
   pi_estimate = parallel_pi(no_tosses, thread_count);
-  endwtime = get_time(); 
+  endwtime = get_time();
 
   printf("%s: Wall clock time = %f with %d threads\n",
     testmsg, endwtime - startwtime, thread_count);
