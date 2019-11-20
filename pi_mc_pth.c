@@ -35,8 +35,8 @@ void* thread_work(void* rank) {
   int me_int = (int) me;
 
   for (int i = me; i < number_of_tosses; i += thread_count) {
-      x = 2 * rand_r(&me_int) / ((double)RAND_MAX) - 1.0;
-      y = 2 * rand_r(&me_int) / ((double)RAND_MAX) - 1.0;
+      x = 2LL * rand_r(&me_int) / ((double)RAND_MAX) - 1.0;
+      y = 2LL * rand_r(&me_int) / ((double)RAND_MAX) - 1.0;
       distance_squared = x * x + y * y;
       if (distance_squared <= 1) {
           pthread_mutex_lock(&mutex);
