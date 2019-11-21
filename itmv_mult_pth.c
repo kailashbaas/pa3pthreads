@@ -78,9 +78,17 @@ void mv_compute(int i) {
  * Global out vars:
  *            double vector_y[]:  vector y
  */
-void work_block(long my_rank) {
+void work_block(long my_rank) {	
   /*Your solution*/
 
+	//Works for the basic case. Will re-think this when I have more time 
+	int start = my_rank * no_tasks;
+	int end  = my_rank+1 * no_tasks;
+
+	int no_tasks = matrix_dim / thread_count;
+	for (int t = 0 ; t < no_iterations; t++){
+		;
+	}
 }
 
 /*---------------------------------------------------------------------
@@ -109,6 +117,9 @@ void work_block(long my_rank) {
  */
 void work_blockcyclic(long my_rank) {
   /*Your solution*/
+	for (int t = 0; t < no_iterations; t++){
+		;
+	}
 }
 
 /*-------------------------------------------------------------------
