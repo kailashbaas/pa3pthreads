@@ -63,9 +63,16 @@ int cs140barrier_wait(cs140barrier *bstate) {
 	bstate->arrive_nthread += 1;
 	if (bstate->arrive_nthread == bstate->total_nthread)
 	{
+		//Set state for new round
 		bstate->arrive_nthread = 0;
 		bstate->odd_round ^= 1;    //1^1 = 0 ... 0^1 = 1
+
+		//Wake up all other threads
 		pthread_cond_broadcast(&bstate->barrier_cond);
+
+		//Release the lock then return 1;
+		pthread_mutex_unlock(&bstate->barrier_mutex);
+		return 1;
 	}
 
 	else
