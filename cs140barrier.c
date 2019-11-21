@@ -12,7 +12,7 @@
  * Initialize variables in a cs140barrier.
  * It should initize the assoicated phtread mutex and condition variables
  * It should also set the intial values for other fields.
- * The odd_rount field should be intiaized to be False.
+ * The odd_round field should be intiaized to be False.
  *
  * Argument:  bstate -- keep the state of a cs140barrier,
  *                      where bstate->odd_round is initialized to be False.
@@ -27,10 +27,16 @@ int cs140barrier_init(cs140barrier *bstate, int total_nthread) {
 	pthread_mutex_init(&bstate->barrier_mutex, NULL);
 
 	bstate->total_nthread = total_nthread;
-	bstate->odd_round = TRUE;
+	bstate->odd_round = FALSE;
 	bstate->arrive_nthread = 0;
 
-  return 0;
+  if (
+			bstate->total_nthread != total_nthread ||
+			bstate->odd_round != FALSE ||
+			bstate->arrive_nthread != 0
+		 )
+		return -1;
+	return 0;
 }
 
 /******************************************************
@@ -52,7 +58,25 @@ int cs140barrier_init(cs140barrier *bstate, int total_nthread) {
  */
 
 int cs140barrier_wait(cs140barrier *bstate) {
-  /*Your solution*/
+
+	pthread_mutex_lock(&bstate->barrier_mutex);
+	bstate->arrive_nthread += 1;
+	if (bstate->arrive_nthread == bstate->total_nthread)
+	{
+		bstate->arrive_nthread = 0;
+		bstate->odd_round ^= 1;    //1^1 = 0 ... 0^1 = 1
+		pthread_cond_broadcast(&bstate->barrier_cond);
+	}
+
+	else
+	{
+		int is_odd_round = bstate->odd_round;	
+		while(is_odd_round == bstate->odd_round){
+			pthread_cond_wait(&bstate->barrier_cond, &bstate->barrier_mutex);	
+		}
+	}
+	
+	pthread_mutex_unlock(&bstate->barrier_mutex);
 
   return 0;
 }
@@ -68,6 +92,6 @@ int cs140barrier_wait(cs140barrier *bstate) {
 
 int cs140barrier_destroy(cs140barrier *bstate) {
   /*Your solution*/
-
+	pthread_mutex_destroy(&bstate->barrier_mutex);	
   return 0;
 }
