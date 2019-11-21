@@ -80,6 +80,7 @@ void mv_compute(int i) {
  */
 void work_block(long my_rank) {
   /*Your solution*/
+
 }
 
 /*---------------------------------------------------------------------

@@ -4,6 +4,9 @@
  */
 
 #include "cs140barrier.h"
+#define FALSE 0
+#define TRUE  1
+
 
 /******************************************************
  * Initialize variables in a cs140barrier.
@@ -19,7 +22,13 @@
  */
 
 int cs140barrier_init(cs140barrier *bstate, int total_nthread) {
-  /*Your solution*/
+
+	pthread_cond_init(&bstate->barrier_cond, NULL);
+	pthread_mutex_init(&bstate->barrier_mutex, NULL);
+
+	bstate->total_nthread = total_nthread;
+	bstate->odd_round = TRUE;
+	bstate->arrive_nthread = 0;
 
   return 0;
 }
