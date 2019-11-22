@@ -33,7 +33,7 @@ pthread_barrier_t mybarrier; /*It will be initailized at itmv_mult_test_pth.c*/
  *        double vector_d[]: vector d
  *        double vector_x[]: vector x
  *        matrix_type: matrix_type=0 means A is a regular matrix.
- *                     matrix_type=1 (UPPER_TRIANGULAR) means A is an upper 
+ *                     matrix_type=1 (UPPER_TRIANGULAR) means A is an upper
  *                     triangular matrix
  *        matrix_dim: the global  number of columns (same as the number of rows)
  * Global in/out vars:
@@ -61,7 +61,7 @@ void mv_compute(int i) {
  *            For example, given 2 threads,
  *            Thread 0 should handle computation for Rows 0 and 1, and
  *            Thread 1 should handle computation for Rows 2 and 3.
- * In arg:    
+ * In arg:
  *            my_rank: rank of this thread (counted from 0)
  * Global in vars:
  *            thread_count
@@ -78,22 +78,37 @@ void mv_compute(int i) {
  * Global out vars:
  *            double vector_y[]:  vector y
  */
-void work_block(long my_rank) {	
+int stop;
+void work_block(long my_rank) {
   /*Your solution*/
 
-	//Works for the basic case. Will re-think this when I have more time 
-	int start = my_rank * no_tasks;
-	int end  = my_rank+1 * no_tasks;
-
+	//Works for the basic case. Will re-think this when I have more time
 	int no_tasks = matrix_dim / thread_count;
+	int start = my_rank * no_tasks;
+	int end = (my_rank+1) * no_tasks;
+
 	for (int t = 0 ; t < no_iterations; t++){
-		;
+		for (int i = start; i < end; i++) {
+            mv_compute(i);
+        }
+        pthread_barrier_wait(&mybarrier);
+        if (my_rank == 0) {
+            stop = 1;
+            for (int j = 0; j < matrix_dim; j++) {
+                if (fabs(vector_x[j] - vector_y[j]) > ERROR_THRESHOLD)
+                    stop = 0;
+                vector_x[j] = vector_y[j];
+            }
+        }
+        pthread_barrier_wait(&mybarrier);
+        if (stop)
+            break;
 	}
 }
 
 /*---------------------------------------------------------------------
  * Function:  work_blockcyclic
- * Purpose:   Run t iterations of parallel computation:  {y=d+Ax; x=y} 
+ * Purpose:   Run t iterations of parallel computation:  {y=d+Ax; x=y}
  *            based on block cylic mapping
  *
  * In arg:
@@ -117,8 +132,22 @@ void work_block(long my_rank) {
  */
 void work_blockcyclic(long my_rank) {
   /*Your solution*/
-	for (int t = 0; t < no_iterations; t++){
-		;
+	for (int t = 0 ; t < no_iterations; t++){
+		for (int i = my_rank; i < matrix_dim; i += thread_count) {
+            mv_compute(i);
+        }
+        pthread_barrier_wait(&mybarrier);
+        if (my_rank == 0) {
+            stop = 1;
+            for (int j = 0; j < matrix_dim; j++) {
+                if (fabs(vector_x[j] - vector_y[j]) > ERROR_THRESHOLD)
+                    stop = 0;
+                vector_x[j] = vector_y[j];
+            }
+        }
+        pthread_barrier_wait(&mybarrier);
+        if (stop)
+            break;
 	}
 }
 
@@ -132,7 +161,7 @@ void work_blockcyclic(long my_rank) {
  *                          A is an upper triangular matrix
  *            n: the global number of columns (same as the number of rows)
  *            t: the number of iterations
- * In/out:    x: column vector x 
+ * In/out:    x: column vector x
  *            y: column vector y
  * Return:  1  means succesful 0 means unsuccessful
  *
@@ -158,10 +187,10 @@ int itmv_mult_seq(double A[], double x[], double d[], double y[],
         y[i] += A[i * n + j] * x[j];
       }
     }
-    
+
     // Check if reach convergence.
     stop = 1;
-    for (i = 0; i < n && stop; i++) 
+    for (i = 0; i < n && stop; i++)
       if (fabs(x[i] - y[i]) > ERROR_THRESHOLD) {
         stop = 0;
       }
