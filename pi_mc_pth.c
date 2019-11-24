@@ -31,12 +31,11 @@ pthread_mutex_t
 void* thread_work(void* rank) {
   /*Your solution*/
   double x, y, distance_squared;
-  long me = ((long) rank);
-  int me_int = (int) me;
+  long me = (long) rank;
 
-  for (int i = me; i < number_of_tosses; i += thread_count) {
-      x = 2LL * rand_r(&me_int) / ((double)RAND_MAX) - 1.0;
-      y = 2LL * rand_r(&me_int) / ((double)RAND_MAX) - 1.0;
+  for (long long int i = me; i < number_of_tosses; i += thread_count) {
+      x = 2.0 * rand_r((unsigned int*) &me) / ((double)RAND_MAX) - 1.0;
+      y = 2.0 * rand_r((unsigned int*) &me) / ((double)RAND_MAX) - 1.0;
       distance_squared = x * x + y * y;
       if (distance_squared <= 1) {
           pthread_mutex_lock(&mutex);

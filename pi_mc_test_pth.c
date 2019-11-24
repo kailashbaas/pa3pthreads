@@ -52,7 +52,7 @@ char* pi_test(char* testmsg, long long int no_tosses, double threshold) {
 
 char* pi_test1() { return pi_test("Test 1", 1000000, 0.01); }
 
-char* pi_test2() { return pi_test("Test 2", 1000000000, 0.01); }
+char* pi_test2() { return pi_test("Test 2", 100000000, 0.01); }
 
 /*-------------------------------------------------------------------
  * Run all tests.  Ignore returned messages.

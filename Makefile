@@ -2,7 +2,7 @@
 CC      = gcc
 CFLAGS  = -O
 LDFLAGS = -lpthread -lm
-#CFLAGS  =  -O -DDEBUG1 -g
+CFLAGS  =  -O -g #-DDEBUG1 -g
 
 OBJECTS0 = pi_seq.o minunit.o
 OBJECTS1 = pi_mc_test_pth.o pi_mc_pth.o minunit.o

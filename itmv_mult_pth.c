@@ -83,12 +83,14 @@ void work_block(long my_rank) {
   /*Your solution*/
 
 	//Works for the basic case. Will re-think this when I have more time
-	int no_tasks = matrix_dim / thread_count;
+    // TODO: change this, doesn't work for cases where matrix_dim isn't evenly 
+    // divisible by thread_count
+	int no_tasks = ceil((double) matrix_dim / (double) thread_count);
 	int start = my_rank * no_tasks;
 	int end = (my_rank+1) * no_tasks;
 
 	for (int t = 0 ; t < no_iterations; t++){
-		for (int i = start; i < end; i++) {
+		for (int i = start; i < end && i < matrix_dim; i++) {
             mv_compute(i);
         }
         pthread_barrier_wait(&mybarrier);
