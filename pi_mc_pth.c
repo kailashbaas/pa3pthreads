@@ -32,17 +32,23 @@ void* thread_work(void* rank) {
   /*Your solution*/
   double x, y, distance_squared;
   long me = (long) rank;
+  long long local_num_in_circle = 0;
 
   for (long long int i = me; i < number_of_tosses; i += thread_count) {
       x = 2.0 * rand_r((unsigned int*) &me) / ((double)RAND_MAX) - 1.0;
       y = 2.0 * rand_r((unsigned int*) &me) / ((double)RAND_MAX) - 1.0;
       distance_squared = x * x + y * y;
       if (distance_squared <= 1) {
-          pthread_mutex_lock(&mutex);
-          number_in_circle++;
-          pthread_mutex_unlock(&mutex);
+          local_num_in_circle++;
       }
   }
+  pthread_mutex_lock(&mutex);
+  printf("Rank: %lld\tlocal sum: %lld\tglobal sum: %lld\n", me, local_num_in_circle, number_in_circle);
+  number_in_circle += local_num_in_circle;
+  printf("Rank: %lld\tlocal sum: %lld\tglobal sum: %lld\n", me, local_num_in_circle, number_in_circle);
+  pthread_mutex_unlock(&mutex);
+
+
 
   return NULL;
 }
@@ -62,6 +68,7 @@ double parallel_pi(long long int no_tosses, int no_threads) {
   /*Your solution*/
   thread_count = no_threads;
   number_of_tosses = no_tosses;
+  number_in_circle = 0;
   pthread_t* threads = malloc(no_threads * sizeof(pthread_t));
   pthread_mutex_init(&mutex, NULL);
 
@@ -72,6 +79,8 @@ double parallel_pi(long long int no_tosses, int no_threads) {
   for (long i = 0; i < no_threads; i++) {
       pthread_join(threads[i], NULL);
   }
+
+  printf("At end, num_in_circle = %d\n", number_in_circle);
 
   pthread_mutex_destroy(&mutex);
   free(threads);

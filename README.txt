@@ -41,7 +41,9 @@ Report for Question 3 with Test 3.a
         Parallel time: 5.442367 s
         Speedup: 2.79
         Efficiency: 0.6975
-Block mapping performs the best, likely because it minimizes false sharing.
+Block mapping performs the best, likely because it minimizes false sharing. Block cyclic mapping
+has an efficiency drop when the number of cores is increased from 2 to 4, which may be because
+false sharing occurs more frequently when there are more cores.
 
 Report for Question 3 with Test 3.b
 1 core:
